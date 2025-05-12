@@ -1,7 +1,7 @@
 import { createServer, IncomingMessage, Server, ServerResponse } from 'http';
 import { userRouter } from './routers/UserRouter';
 
-const server = createServer(
+export const server = createServer(
   async (req: IncomingMessage, res: ServerResponse) => {
     await userRouter(req, res);
   },
