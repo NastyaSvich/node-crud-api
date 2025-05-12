@@ -5,6 +5,7 @@ import {
   ResponseResultError,
   ResponseResultSuccess,
 } from '../models/ResponseResult';
+import { isValidUserData } from '../utils/TypeGuard';
 
 const users: User[] = [];
 
@@ -19,12 +20,14 @@ export const getUserById = (
 };
 
 export const addUser = (
-  body: Omit<User, 'id'>,
+  body: unknown,
 ): ResponseResultSuccess<User> | ResponseResultError => {
-  const { username, age, hobbies } = body;
-  if (!username || typeof age !== 'number' || !Array.isArray(hobbies)) {
+  if (!isValidUserData(body)) {
     return responseErrors.MRF();
   }
+
+  const { username, age, hobbies } = body;
+
   const newUser: User = { id: uuidv4(), username, age, hobbies };
   users.push(newUser);
 
@@ -33,16 +36,18 @@ export const addUser = (
 
 export const updateUser = (
   id: string,
-  body: Omit<User, 'id'>,
+  body: unknown,
 ): ResponseResultSuccess<User> | ResponseResultError => {
   const index = users.findIndex((user) => user.id === id);
   if (index === -1) {
     return responseErrors.NF();
   }
-  const { username, age, hobbies } = body;
-  if (!username || typeof age !== 'number' || !Array.isArray(hobbies)) {
+
+  if (!isValidUserData(body)) {
     return responseErrors.MRF();
   }
+
+  const { username, age, hobbies } = body;
   users[index] = { id, username, age, hobbies };
   return responseSuccess.OK(users[index]);
 };
